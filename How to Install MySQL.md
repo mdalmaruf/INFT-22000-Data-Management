@@ -52,7 +52,7 @@ This guide will walk you through the process of installing **MySQL Server** and 
 ## Step 5: Test Installation via Command Line (Optional)
 
 1. Open the MYSQL Command Prompt.
-   - Optional: Run the following command to log in to MySQL Shell:
+   - Optional: Run the following command to log in to MySQL Shell in case it does not show the password field:
       ```bash
       mysql -u root -p
       ```
