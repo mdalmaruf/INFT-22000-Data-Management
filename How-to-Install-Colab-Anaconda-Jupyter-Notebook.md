@@ -37,8 +37,7 @@ print("Dataframe:")
 print(df)
 
 # Basic analytics
-print("
-Average Age:", df['Age'].mean())
+print("Average Age:", df['Age'].mean())
 ```
 This program demonstrates basic data management using `pandas`.
 
