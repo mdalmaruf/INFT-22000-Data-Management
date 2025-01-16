@@ -1,0 +1,13 @@
+CustomerID,Name,Email,Region,PurchaseAmount
+101,Alice,alice@example.com,North,250.75
+102,Bob,bob@example.com,East,120.5
+103,Charlie,invalid_email,InvalidRegion,330
+104,David,david@example.com,West,-150
+105,Eve,eve@example.com,North,200
+106,Frank,frank.example.com,East,450
+107,Grace,grace@example.com,South,
+108,Helen,,West,310.25
+109,Ivy,ivy@example.com,North,180.75
+110,Jack,jack@example.com,Unknown,InvalidAmount
+105,Eve,eve@example.com,North,200
+103,Charlie,charlie@example.com,South,330
