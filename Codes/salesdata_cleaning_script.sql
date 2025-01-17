@@ -39,6 +39,8 @@ SELECT * FROM sales WHERE Region NOT IN ('North', 'East', 'South', 'West');
 SELECT * FROM sales WHERE PurchaseAmount < 0 OR PurchaseAmount NOT REGEXP '^[0-9]+(\.[0-9]{1,2})?$';
 
 -- Remove duplicates
+SET SQL_SAFE_UPDATES = 0;
+
 DELETE FROM sales
 WHERE CustomerID IN (
     SELECT CustomerID
@@ -50,6 +52,9 @@ WHERE CustomerID IN (
     ) AS duplicates
 )
 AND NOT (Name = 'Eve' AND Email = 'eve@example.com' AND PurchaseAmount = '200');
+
+SET SQL_SAFE_UPDATES = 1;
+
 
 -- Update invalid email addresses with placeholders
 UPDATE sales
