@@ -151,7 +151,7 @@ GROUP BY dept_id;
 ## 5. SQL Joins
 
 Joins allow us to retrieve data from multiple tables based on related columns.
-
+![Table JOINS](Images/JOINS.png)
 ### SQL Commands:
 
 #### INNER JOIN:
