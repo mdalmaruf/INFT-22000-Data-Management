@@ -70,13 +70,23 @@ INSERT INTO employees (emp_id, emp_name, salary, dept_id) VALUES
 Example constraint check:
 
 ```sql
-SELECT * FROM employees WHERE salary < 0;
+CREATE TABLE employees (
+    emp_id INT PRIMARY KEY,
+    emp_name VARCHAR(100) NOT NULL,
+    salary DECIMAL(10, 2) CHECK (salary > 0), -- CHECK constraint to ensure salary is positive
+    dept_id INT,
+    FOREIGN KEY (dept_id) REFERENCES departments(dept_id)
+);
+
+-- Attempting to insert a negative salary (this should fail)
+INSERT INTO employees (emp_id, emp_name, salary, dept_id) 
+VALUES (104, 'David Lee', -45000, 1);
 ```
 
 ### Expected Output:
 
 ```
-No rows returned (CHECK constraint prevents negative salaries).
+ERROR: Check constraint 'employees_chk_1' failed for column 'salary'
 ```
 
 ---
