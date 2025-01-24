@@ -7,6 +7,9 @@ To create tables in SQL, we use the `CREATE TABLE` statement. Below is an exampl
 ### SQL Commands:
 
 ```sql
+CREATE DATABASE TempDB;
+USE TempDB;
+
 CREATE TABLE departments (
     dept_id INT PRIMARY KEY,
     dept_name VARCHAR(50) UNIQUE NOT NULL
