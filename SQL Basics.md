@@ -55,6 +55,7 @@ INSERT INTO employees (emp_id, emp_name, salary, dept_id) VALUES
 ```
 
 ---
+![Table Constraints](Images/TableConstraints.png)
 
 ## 3. Table Constraints
 
