@@ -67,6 +67,39 @@ INSERT INTO employees (emp_id, emp_name, salary, dept_id) VALUES
 - **NOT NULL**: Ensures a column cannot have NULL values.
 - **CHECK**: Ensures specified conditions are met.
 
+
+Example Primary Key: Primary Key: Uniquely identifies each record.
+```sql
+CREATE TABLE students (
+    student_id INT PRIMARY KEY,
+    name VARCHAR(50)
+);
+```
+Example Foreign Key: Links records between two tables.
+```sql
+CREATE TABLE enrollments (
+    enroll_id INT PRIMARY KEY,
+    student_id INT,
+    FOREIGN KEY (student_id) REFERENCES students(student_id)
+);
+```
+Example Composite Key: Combines multiple columns to uniquely identify a record.
+```sql
+CREATE TABLE orders (
+    order_id INT,
+    product_id INT,
+    quantity INT,
+    PRIMARY KEY (order_id, product_id)
+);
+```
+Example Unique Key: Ensures no duplicate values in a column except for NULL values
+```sql
+CREATE TABLE users (
+    user_id INT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE
+);
+```
+
 Example constraint check:
 
 ```sql
