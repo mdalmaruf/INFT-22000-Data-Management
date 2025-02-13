@@ -1,0 +1,199 @@
+# 📚 Student Enrollment Database - MySQL Implementation
+
+This project implements a **Student Enrollment System** using **MySQL**, designed to ensure proper data integrity and constraints.
+
+---
+
+## 📌 **Entity-Relationship Diagram (ERD)**
+Below is the **ERD diagram** representing the database schema:
+
+![Student-Enrollment-ERD](./images/student_enrollment_erd.png)
+
+---
+
+## 🛠 **Database Design Steps**
+### **Step 1: Create the Database**
+```sql
+CREATE DATABASE StudentEnrollmentDB;
+USE StudentEnrollmentDB;
+```
+
+---
+
+## 🔗 **Relationships & Constraints**
+This section explains **how constraints are added** to enforce **business rules** in the database.
+
+### **📌 Staff to Student Relationship Constraint**
+> **A staff member may only tutor students who are in the same region.**  
+
+**Implementation:**  
+- A `CHECK` constraint ensures that a **student’s region matches the assigned staff’s region**.
+- This is implemented using a **trigger** that prevents inserting a student whose `Region` differs from their assigned `StaffNo` region.
+
+**SQL Code:**
+```sql
+CREATE TRIGGER Check_Staff_Student_Region
+BEFORE INSERT ON Student
+FOR EACH ROW
+BEGIN
+    DECLARE staff_region VARCHAR(50);
+    SELECT Region INTO staff_region FROM Staff WHERE StaffNo = NEW.StaffNo;
+    
+    IF NEW.Region != staff_region THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Error: A staff member can only tutor students from the same region';
+    END IF;
+END;
+```
+**ERD Reference:**
+![Staff-Student-ERD](./images/staff_student_erd.png)
+
+---
+
+### **📌 Student Course Enrollment Constraint**
+> **Students cannot enroll in more than 180 points worth of courses at any one time.**  
+
+**Implementation:**  
+- A `CHECK` constraint does not work across multiple rows, so we use a **trigger**.
+- The trigger calculates a student’s total enrolled course credits and prevents enrollment if it exceeds **180 credits**.
+
+**SQL Code:**
+```sql
+CREATE TRIGGER Check_Student_Credit_Limit
+BEFORE INSERT ON Enrollment
+FOR EACH ROW
+BEGIN
+    DECLARE total_credit INT;
+    SELECT SUM(Credit) INTO total_credit
+    FROM Course c
+    JOIN Enrollment e ON c.CourseCode = e.CourseCode
+    WHERE e.StudentID = NEW.StudentID;
+
+    IF total_credit + (SELECT Credit FROM Course WHERE CourseCode = NEW.CourseCode) > 180 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Error: Student cannot enroll in more than 180 credit points.';
+    END IF;
+END;
+```
+**ERD Reference:**
+![Course-Enrollment-ERD](./images/course_enrollment_erd.png)
+
+---
+
+### **📌 Course Credit Constraint**
+> **The `Credit` value in `Course` must be either 15 or 30 points.**  
+
+**Implementation:**  
+- This is enforced using a **`CHECK` constraint**.
+
+**SQL Code:**
+```sql
+CREATE TABLE Course (
+    CourseCode VARCHAR(10) PRIMARY KEY,
+    Title VARCHAR(100) NOT NULL,
+    Credit INT CHECK (Credit IN (15, 30)), 
+    Quota INT NOT NULL,
+    StaffNo INT,
+    FOREIGN KEY (StaffNo) REFERENCES Staff(StaffNo) ON DELETE SET NULL
+);
+```
+
+**ERD Reference:**
+![Staff-Course-ERD](./images/staff_course_erd.png)
+
+---
+
+### **📌 Assignment Constraints**
+> **A 30-point course may have up to 5 assignments; a 15-point course may have up to 3 assignments.**  
+
+**Implementation:**  
+- A **trigger** prevents inserting more than the allowed number of assignments for a course.
+
+**SQL Code:**
+```sql
+CREATE TRIGGER Check_Assignment_Limit
+BEFORE INSERT ON Assignment
+FOR EACH ROW
+BEGIN
+    DECLARE max_assignments INT;
+    SELECT CASE 
+        WHEN Credit = 30 THEN 5
+        WHEN Credit = 15 THEN 3
+    END INTO max_assignments
+    FROM Course WHERE CourseCode = NEW.CourseCode;
+    
+    DECLARE current_count INT;
+    SELECT COUNT(*) INTO current_count 
+    FROM Assignment 
+    WHERE CourseCode = NEW.CourseCode;
+
+    IF current_count >= max_assignments THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Error: Assignment limit exceeded for this course.';
+    END IF;
+END;
+```
+**ERD Reference:**
+![Enrollment-Assignment-ERD](./images/enrollment_assignment_erd.png)
+
+---
+
+### **📌 Grade Constraint**
+> **The `Grade` attribute in `Assignment` must be between 0 and 100.**  
+
+**Implementation:**  
+- A simple **`CHECK` constraint** is sufficient.
+
+**SQL Code:**
+```sql
+CREATE TABLE Assignment (
+    StudentID INT,
+    CourseCode VARCHAR(10),
+    AssignmentNo INT AUTO_INCREMENT,
+    Grade INT CHECK (Grade BETWEEN 0 AND 100),
+    PRIMARY KEY (StudentID, CourseCode, AssignmentNo),
+    FOREIGN KEY (StudentID, CourseCode) REFERENCES Enrollment(StudentID, CourseCode) ON DELETE CASCADE
+);
+```
+
+---
+
+## 🏢 **Final ERD Representation**
+Here’s a complete **ERD diagram** of the entire database structure:
+
+![Full-ERD](./images/full_erd.png)
+
+---
+
+## 🔎 **Query Examples**
+### **1️⃣ Get All Students and Their Enrolled Courses**
+```sql
+SELECT s.StudentID, s.Name, e.CourseCode, c.Title, e.FinalGrade
+FROM Student s
+JOIN Enrollment e ON s.StudentID = e.StudentID
+JOIN Course c ON e.CourseCode = c.CourseCode;
+```
+
+### **2️⃣ Find Assignments of a Specific Student**
+```sql
+SELECT a.StudentID, s.Name, a.CourseCode, a.AssignmentNo, a.Grade
+FROM Assignment a
+JOIN Student s ON a.StudentID = s.StudentID
+WHERE s.Name = 'Alice Brown';
+```
+
+---
+
+## 🔮 **Conclusion**
+- **Constraints ensure data integrity**: preventing students from exceeding course limits, maintaining regional consistency, and restricting valid credit values.
+- **Triggers enforce complex constraints** where `CHECK` constraints do not apply (e.g., total enrolled credits, assignment limits).
+- The **ERD diagrams** visually represent relationships, cardinality, and constraints.
+
+---
+
+## 🚀 **Next Steps**
+👉 Implement **stored procedures** for generating reports.  
+👉 Create **views** for student progress tracking.  
+👉 Add **indexing for performance optimization**.
+
+Contributions are welcome! **Fork & star this repository** if you find it useful. 🌟  
